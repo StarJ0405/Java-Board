@@ -1,5 +1,7 @@
 package org.example;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Scanner;
@@ -57,7 +59,7 @@ public class Main {
         System.out.print("게시물 내용을 입력해주세요 : ");
         String desc = scan.nextLine();
         System.out.println("게시물이 등록되었습니다.");
-        posts.put(getEmptyNumber(), new Post(title, desc));
+        posts.put(getEmptyNumber(), new Post(title, desc, LocalDateTime.now()));
     }
 
     private static void list() {
@@ -65,6 +67,7 @@ public class Main {
         for (int i : posts.keySet()) {
             System.out.println("번호 : " + i);
             System.out.println("제목 : " + posts.get(i).getTitle());
+            System.out.println("등록날짜 : " + posts.get(i).getDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd hh:mm:ss")));
             System.out.println("==================");
         }
     }

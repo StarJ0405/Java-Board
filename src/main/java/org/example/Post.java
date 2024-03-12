@@ -1,12 +1,18 @@
 package org.example;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class Post {
     private String title;
     private String description;
 
-    public Post(String title, String description) {
+    private LocalDateTime date;
+
+    public Post(String title, String description, LocalDateTime date) {
         this.title = title;
         this.description = description;
+        this.date = date;
     }
 
     public String getTitle() {
@@ -23,5 +29,9 @@ public class Post {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
     }
 }
