@@ -11,6 +11,7 @@ public class Main {
     private static final Scanner scan = new Scanner(System.in);
 
     public static void main(String[] args) {
+        initial();
         main:
         while (true) {
             System.out.print("명령어 : ");
@@ -51,6 +52,12 @@ public class Main {
                         return i;
             return max + 1;
         } else return 1;
+    }
+
+    private static void initial() {
+        posts.put(getEmptyNumber(), new Post("안녕하세요 반갑습니다. 자바 공부중이에요.", "즐거운 자바시간", LocalDateTime.now()));
+        posts.put(getEmptyNumber(), new Post("자바 질문좀 할게요~", "제곧내", LocalDateTime.now()));
+        posts.put(getEmptyNumber(), new Post("정처기 따야되나요?", "역시 따는게 낫군여", LocalDateTime.now()));
     }
 
     private static void add() {
