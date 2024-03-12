@@ -1,6 +1,5 @@
 package org.example;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -56,9 +55,9 @@ public class Main {
     }
 
     private static void initial() {
-        posts.put(getEmptyNumber(), new Post(1, "안녕하세요 반갑습니다. 자바 공부중이에요.", "즐거운 자바시간", LocalDateTime.now()));
-        posts.put(getEmptyNumber(), new Post(2, "자바 질문좀 할게요~", "제곧내", LocalDateTime.now()));
-        posts.put(getEmptyNumber(), new Post(3, "정처기 따야되나요?", "역시 따는게 낫군여", LocalDateTime.now()));
+        posts.put(getEmptyNumber(), new Post(1, "안녕하세요 반갑습니다. 자바 공부중이에요.", "즐거운 자바시간"));
+        posts.put(getEmptyNumber(), new Post(2, "자바 질문좀 할게요~", "제곧내"));
+        posts.put(getEmptyNumber(), new Post(3, "정처기 따야되나요?", "역시 따는게 낫군여"));
     }
 
     private static void add() {
@@ -68,7 +67,7 @@ public class Main {
         String desc = scan.nextLine();
         System.out.println("게시물이 등록되었습니다.");
         int num = getEmptyNumber();
-        posts.put(num, new Post(num, title, desc, LocalDateTime.now()));
+        posts.put(num, new Post(num, title, desc));
     }
 
     private static void list() {
@@ -114,7 +113,10 @@ public class Main {
                 Integer num2 = getNumber("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 추천, 3. 수정, 4. 삭제, 5. 목록으로) : ");
                 switch (num2) {
                     case 1:
-                        System.out.println("[댓글 등록 기능]");
+                        System.out.print("댓글 내용 : ");
+                        String comment = scan.nextLine();
+                        posts.get(num).addComments(comment);
+                        System.out.println("댓글이 성공적으로 등록되었습니다");
                         break;
                     case 2:
                         System.out.println("[추천 기능]");
@@ -134,7 +136,6 @@ public class Main {
             }
         } else
             System.out.println("없는 게시물 번호입니다.");
-
     }
 
     private static Integer getNumber(String question) {
