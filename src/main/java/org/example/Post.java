@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Post {
-    private int num;
+    private final int num;
     private String title;
     private String description;
     private LocalDateTime date;
