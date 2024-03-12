@@ -18,4 +18,8 @@ public class Member {
     public String getNickname() {
         return nickname;
     }
+
+    public boolean checkPassword(String password) {
+        return this.password.equals(password);
+    }
 }

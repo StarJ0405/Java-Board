@@ -7,12 +7,13 @@ public class Main {
     private static final LinkedHashMap<Integer, Post> posts = new LinkedHashMap<Integer, Post>();
     private static final HashMap<String, Member> members = new HashMap<String, Member>();
     private static final Scanner scan = new Scanner(System.in);
+    private static Member who = null;
 
     public static void main(String[] args) {
         initial();
         main:
         while (true) {
-            System.out.print("명령어 : ");
+            System.out.print("명령어를 입력해주세요" + (who != null ? "[" + who.getId() + "(" + who.getNickname() + ")]" : "") + " : ");
             String cmd = scan.nextLine();
             switch (cmd.toLowerCase().replace(" ", "")) {
                 case "exit":
@@ -38,6 +39,13 @@ public class Main {
                     break;
                 case "signup":
                     signup();
+                    break;
+                case "login":
+                    login();
+                    break;
+                case "logout":
+                    who = null;
+                    System.out.println("로그아웃에 성공했습니다.");
                     break;
                 default:
                     System.out.println("없는 명령어입니다. 다시 입력해주세요.");
@@ -113,7 +121,7 @@ public class Main {
         if (num != null && posts.containsKey(num)) {
             posts.get(num).show();
             sub:
-            while (true) {
+            while (who != null) {
                 Integer num2 = getNumber("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 추천, 3. 수정, 4. 삭제, 5. 목록으로) : ");
                 switch (num2) {
                     case 1:
@@ -123,6 +131,7 @@ public class Main {
                         System.out.println("댓글이 성공적으로 등록되었습니다");
                         break;
                     case 2:
+
                         System.out.println("[추천 기능]");
                         break;
                     case 3:
@@ -185,5 +194,23 @@ public class Main {
         String nickname = scan.nextLine();
         System.out.println("==== 회원 가입이 완료됐습니다 ====");
         members.put(id, new Member(id, password, nickname));
+    }
+
+    private static void login() {
+        if (who != null) {
+            System.out.println("이미 로그인 중입니다. 로그아웃을 시도해주세요.");
+            return;
+        }
+        System.out.print("아이디 : ");
+        String id = scan.nextLine();
+        System.out.print("비밀번호 : ");
+        String password = scan.nextLine();
+        if (!members.containsKey(id) || !members.get(id).checkPassword(password))
+            System.out.println("비밀번호를 틀렸거나 잘못된 회원정보입니다.");
+        else {
+            Member member = members.get(id);
+            System.out.println(member.getNickname() + "님 환영합니다!");
+            who = member;
+        }
     }
 }
