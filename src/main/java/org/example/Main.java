@@ -5,6 +5,7 @@ import java.util.*;
 
 public class Main {
     private static final LinkedHashMap<Integer, Post> posts = new LinkedHashMap<Integer, Post>();
+    private static final HashMap<String, Member> members = new HashMap<String, Member>();
     private static final Scanner scan = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -34,6 +35,9 @@ public class Main {
                     break;
                 case "search":
                     search();
+                    break;
+                case "signup":
+                    signup();
                     break;
                 default:
                     System.out.println("없는 명령어입니다. 다시 입력해주세요.");
@@ -165,5 +169,21 @@ public class Main {
             System.out.println("검색 결과가 없습니다.");
             System.out.println("==================");
         }
+    }
+
+    private static void signup() {
+        System.out.println("==== 회원 가입을 진행합니다 ====");
+        System.out.print("아이디를 입력해주세요 : ");
+        String id = scan.nextLine();
+        if (members.containsKey(id)) {
+            System.out.println("이미 존재하는 아이디입니다.");
+            return;
+        }
+        System.out.print("비밀번호를 입력해주세요 : ");
+        String password = scan.nextLine();
+        System.out.print("닉네임을 입력해주세요 : ");
+        String nickname = scan.nextLine();
+        System.out.println("==== 회원 가입이 완료됐습니다 ====");
+        members.put(id, new Member(id, password, nickname));
     }
 }
