@@ -107,13 +107,9 @@ public class Main {
 
     private static void detail() {
         Integer num = getNumber("상세보기 할 게시물 번호를 입력해주세요 : ");
-        if (num != null && posts.containsKey(num)) {
-            System.out.println("==================");
-            System.out.println("번호 : " + num);
-            System.out.println("제목 : " + posts.get(num).getTitle());
-            System.out.println("내용 : " + posts.get(num).getDescription());
-            System.out.println("==================");
-        } else
+        if (num != null && posts.containsKey(num))
+            posts.get(num).show();
+        else
             System.out.println("없는 게시물 번호입니다.");
 
     }
