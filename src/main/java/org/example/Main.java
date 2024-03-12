@@ -2,9 +2,7 @@ package org.example;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     private static final LinkedHashMap<Integer, Post> posts = new LinkedHashMap<Integer, Post>();
@@ -35,6 +33,9 @@ public class Main {
                 case "detail":
                     detail();
                     break;
+                case "search":
+                    search();
+                    break;
                 default:
                     System.out.println("없는 명령어입니다. 다시 입력해주세요.");
                     break;
@@ -55,9 +56,9 @@ public class Main {
     }
 
     private static void initial() {
-        posts.put(getEmptyNumber(), new Post("안녕하세요 반갑습니다. 자바 공부중이에요.", "즐거운 자바시간", LocalDateTime.now()));
-        posts.put(getEmptyNumber(), new Post("자바 질문좀 할게요~", "제곧내", LocalDateTime.now()));
-        posts.put(getEmptyNumber(), new Post("정처기 따야되나요?", "역시 따는게 낫군여", LocalDateTime.now()));
+        posts.put(getEmptyNumber(), new Post(1, "안녕하세요 반갑습니다. 자바 공부중이에요.", "즐거운 자바시간", LocalDateTime.now()));
+        posts.put(getEmptyNumber(), new Post(2, "자바 질문좀 할게요~", "제곧내", LocalDateTime.now()));
+        posts.put(getEmptyNumber(), new Post(3, "정처기 따야되나요?", "역시 따는게 낫군여", LocalDateTime.now()));
     }
 
     private static void add() {
@@ -66,7 +67,8 @@ public class Main {
         System.out.print("게시물 내용을 입력해주세요 : ");
         String desc = scan.nextLine();
         System.out.println("게시물이 등록되었습니다.");
-        posts.put(getEmptyNumber(), new Post(title, desc, LocalDateTime.now()));
+        int num = getEmptyNumber();
+        posts.put(num, new Post(num, title, desc, LocalDateTime.now()));
     }
 
     private static void list() {
@@ -122,6 +124,26 @@ public class Main {
             return Integer.parseInt(scan.nextLine());
         } catch (NumberFormatException nfe) {
             return null;
+        }
+    }
+
+    private static void search() {
+        System.out.print("검색 키워드를 입력해주세요 : ");
+        String keyword = scan.nextLine();
+        List<Post> list = new ArrayList<Post>();
+        for (Post post : posts.values())
+            if (post.getTitle().contains(keyword))
+                list.add(post);
+        if (list.size() > 0)
+            for (Post post : list) {
+                System.out.println("번호 : " + post.getNum());
+                System.out.println("제목 : " + post.getTitle());
+                System.out.println("==================");
+            }
+        else {
+            System.out.println("==================");
+            System.out.println("검색 결과가 없습니다.");
+            System.out.println("==================");
         }
     }
 }
