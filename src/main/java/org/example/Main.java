@@ -107,9 +107,32 @@ public class Main {
 
     private static void detail() {
         Integer num = getNumber("상세보기 할 게시물 번호를 입력해주세요 : ");
-        if (num != null && posts.containsKey(num))
+        if (num != null && posts.containsKey(num)) {
             posts.get(num).show();
-        else
+            sub:
+            while (true) {
+                Integer num2 = getNumber("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 추천, 3. 수정, 4. 삭제, 5. 목록으로) : ");
+                switch (num2) {
+                    case 1:
+                        System.out.println("[댓글 등록 기능]");
+                        break;
+                    case 2:
+                        System.out.println("[추천 기능]");
+                        break;
+                    case 3:
+                        System.out.println("[수정 기능]");
+                        break;
+                    case 4:
+                        System.out.println("[삭제 기능]");
+                        break;
+                    case 5:
+                        break sub;
+                    default:
+                        System.out.println("없는 기능입니다. 다시 선택해주세요.");
+                        break;
+                }
+            }
+        } else
             System.out.println("없는 게시물 번호입니다.");
 
     }
