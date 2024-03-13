@@ -67,6 +67,9 @@ public class Main {
                 case "sort":
                     sort();
                     break;
+                case "page":
+                    page();
+                    break;
                 default:
                     View.sendConsoleErrorMessage();
                     break;
@@ -257,5 +260,46 @@ public class Main {
                 break;
         }
         list(list);
+    }
+
+    private static void page() {
+        List<Post> list = DataStore.getPosts().stream().toList();
+        // 3 단위
+        int maxPage = list.size() / 3 + (list.size() % 3 != 0 ? 1 : 0);
+        int page = DataStore.getPage();
+        int start = page / 5;
+        int end = Math.min(maxPage, start + 5);
+        System.out.println(maxPage);
+        sub:
+        while (true) {
+            list(list.subList(page * 3, Math.min(list.size(), (page + 1) * 3)));
+            String msg = "";
+            for (int i = start; i < end; i++)
+                msg += (i == page ? "[" + (i + 1) + "]" : (i + 1)) + " ";
+            msg += ">>";
+            View.sendMessage(msg);
+            Integer pagingCommand = Optional.ofNullable(Input.getInteger("페이징 명령어를 입력해주세요 ((1. 이전, 2. 다음, 3. 선택, 4. 뒤로가기): ")).orElse(-1);
+            switch (pagingCommand) {
+                case 1:
+                    page = Math.max(0, page - 1);
+                    DataStore.setPage(page);
+                    break;
+                case 2:
+                    page = Math.min(maxPage-1, page + 1);
+                    DataStore.setPage(page);
+                    break;
+                case 3:
+                    Integer newPaging = Input.getInteger("이동하실 페이지 번호를 입력해주세요 : ");
+                    if (newPaging != null && (newPaging - 1) >= 0 && (newPaging - 1) <= maxPage-1) {
+                        page = newPaging - 1;
+                        DataStore.setPage(page);
+                    } else
+                        View.sendMessage("없는 페이지입니다.");
+                    break;
+                case 4:
+                    break sub;
+
+            }
+        }
     }
 }

@@ -28,6 +28,8 @@ public class DataStore {
         return posts.values();
     }
 
+    private static int page = 0;
+
     public static int getEmptyNumber() {
         if (!posts.isEmpty()) {
             int max = posts.keySet().stream().max(Comparator.comparingInt(Integer::intValue)).get();
@@ -66,5 +68,13 @@ public class DataStore {
 
     public static void setWho(Member who) {
         DataStore.who = who;
+    }
+
+    public static int getPage() {
+        return page;
+    }
+
+    public static void setPage(int page) {
+        DataStore.page = page;
     }
 }
