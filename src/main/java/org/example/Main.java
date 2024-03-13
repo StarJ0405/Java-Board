@@ -1,8 +1,6 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class Main {
 
@@ -21,7 +19,7 @@ public class Main {
                     else View.sendConsoleErrorMessage();
                     break;
                 case "list":
-                    list();
+                    list(DataStore.getPosts().stream().toList());
                     break;
                 case "update":
                     if (who != null && who.isAdmin()) update(Input.getInteger("수정할 게시물 번호 : "));
@@ -51,6 +49,7 @@ public class Main {
                     break;
                 case "help":
                     View.sendMessage("list - 게시물 목록");
+                    View.sendMessage("sort - 게시물 정렬");
                     View.sendMessage("search - 게시물 찾기");
                     View.sendMessage("detail - 상세보기");
                     if (who != null) {
@@ -64,6 +63,9 @@ public class Main {
                     View.sendMessage("signup - 회원가입");
                     View.sendMessage("login - 로그인");
                     View.sendMessage("exit - 프로그램 종료");
+                    break;
+                case "sort":
+                    sort();
                     break;
                 default:
                     View.sendConsoleErrorMessage();
@@ -91,14 +93,14 @@ public class Main {
         FileStore.setPost(num + "", post); // 추가
     }
 
-    private static void list() {
+    private static void list(List<Post> list) {
         View.sendMessage("==================");
-        for (int i : DataStore.getPostList()) {
-            Post post = DataStore.getPost(i);
-            View.sendMessage("번호 : " + i);
+        for (Post post : list) {
+            View.sendMessage("번호 : " + post.getNum());
             View.sendMessage("제목 : " + post.getTitle());
-            View.sendMessage("작성일 : " + post.getDate().format(View.getDateTimeFormatter()));
             View.sendMessage("작성자 : " + DataStore.getMember(post.getAuthor()).getNickname());
+            View.sendMessage("조회수 : " + post.getShow());
+            View.sendMessage("좋아요 : " + post.getLoves().size());
             View.sendMessage("==================");
         }
     }
@@ -229,5 +231,31 @@ public class Main {
             View.sendMessage(member.getNickname() + "님 환영합니다!");
             DataStore.setWho(member);
         }
+    }
+
+    public static void sort() {
+        int target = Input.getInteger("정렬 대상을 선택해주세요. (1. 번호,  2. 조회수) : ");
+        int how = Input.getInteger("정렬 방법을 선택해주세요. (1. 오름차순,  2. 내림차순) : ");
+        List<Post> list = new ArrayList<Post>();
+        list.addAll(DataStore.getPosts().stream().toList());
+        switch (target) {
+            case 1:
+                Collections.sort(list, new Comparator<Post>() {
+                    @Override
+                    public int compare(Post o1, Post o2) {
+                        return (o1.getNum() > o2.getNum() ? 1 : -1) * (how == 1 ? 1 : -1);
+                    }
+                });
+                break;
+            case 2:
+                Collections.sort(list, new Comparator<Post>() {
+                    @Override
+                    public int compare(Post o1, Post o2) {
+                        return (o1.getShow() > o2.getShow() ? 1 : -1) * (how == 1 ? 1 : -1);
+                    }
+                });
+                break;
+        }
+        list(list);
     }
 }
