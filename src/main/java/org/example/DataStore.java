@@ -1,5 +1,8 @@
 package org.example;
 
+import org.example.DBSystem.DBStore;
+import org.example.DBSystem.mySQLStore;
+
 import java.util.*;
 
 public class DataStore {
@@ -7,6 +10,9 @@ public class DataStore {
     private static final HashMap<String, Member> members = new HashMap<>();
 
     private static Member who = null;
+    private static DBStore db = new mySQLStore();//new FileStore();
+
+    //
 
     public static boolean hasPost(int num) {
         return posts.containsKey(num);
@@ -76,5 +82,13 @@ public class DataStore {
 
     public static void setPage(int page) {
         DataStore.page = page;
+    }
+
+    public static DBStore getDb() {
+        return db;
+    }
+
+    public static void setDb(DBStore db) {
+        DataStore.db = db;
     }
 }

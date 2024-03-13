@@ -1,7 +1,7 @@
 package org.example;
 
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;

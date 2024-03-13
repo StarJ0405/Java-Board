@@ -1,11 +1,12 @@
 package org.example;
 
+
 import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        FileStore.loadAllData();
+        DataStore.getDb().loadAllData();
         main:
         while (true) {
             Member who = DataStore.getWho();
@@ -93,7 +94,7 @@ public class Main {
         int num = DataStore.getEmptyNumber();
         Post post = new Post(num, DataStore.getWho().getID(), title, desc);
         DataStore.addPost(num, post);
-        FileStore.setPost(num + "", post); // 추가
+        DataStore.getDb().setPost(num + "", post); // 추가
     }
 
     private static void list(List<Post> list) {
@@ -117,7 +118,7 @@ public class Main {
                 post.setTitle(title);
             if (!desc.equals(""))
                 post.setDescription(desc);
-            FileStore.setPost(num + "", post); // 수정
+            DataStore.getDb().setPost(num + "", post); // 수정
             View.sendMessage(num + "번 게시물이 수정되었습니다.");
         } else View.sendMessage("없는 게시물 번호입니다.");
     }
@@ -128,7 +129,7 @@ public class Main {
             if (check != null && check) {
                 View.sendMessage(num + "번 게시물이 삭제되었습니다.");
                 DataStore.removePost(num);
-                FileStore.setPost(num + "", null); // 제거
+                DataStore.getDb().setPost(num + "", null); // 제거
             } else View.sendMessage("게시글 삭제가 취소되었습니다.");
         } else View.sendMessage("없는 게시물 번호입니다.");
     }
@@ -138,7 +139,7 @@ public class Main {
             Post post = DataStore.getPost(num);
             Member who = DataStore.getWho();
             post.show(who);
-            FileStore.setPost(num + "", post); // 조회수 변경
+            DataStore.getDb().setPost(num + "", post); // 조회수 변경
             sub:
             while (who != null) {
                 Integer num2 = Optional.ofNullable(Input.getInteger("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ")).orElse(-1);
@@ -161,7 +162,7 @@ public class Main {
                             View.sendMessage("해당 게시물을 좋아합니다.");
                             post.getLoves().add(who.getID());
                         }
-                        FileStore.setPost(num + "", post);
+                        DataStore.getDb().setPost(num + "", post);
                         detail(num);
                         break sub;
                     case 3:
@@ -212,12 +213,22 @@ public class Main {
             View.sendMessage("이미 존재하는 아이디입니다.");
             return;
         }
+        if (id.length() > 25) {
+            View.sendMessage("아이디는 25자 이내만 가능합니다.");
+            return;
+        }
+
         String password = Input.getString("비밀번호를 입력해주세요 : ");
         String nickname = Input.getString("닉네임을 입력해주세요 : ");
+        if (nickname.length() > 25) {
+            View.sendMessage("닉네임은 25자 이내만 가능합니다.");
+            return;
+        }
+
         View.sendMessage("==== 회원 가입이 완료됐습니다 ====");
         Member member = new Member(id, password, nickname);
         DataStore.addMember(id, member);
-        FileStore.setMember(id, member);
+        DataStore.getDb().setMember(id, member);
     }
 
     private static void login() {
@@ -285,12 +296,12 @@ public class Main {
                     DataStore.setPage(page);
                     break;
                 case 2:
-                    page = Math.min(maxPage-1, page + 1);
+                    page = Math.min(maxPage - 1, page + 1);
                     DataStore.setPage(page);
                     break;
                 case 3:
                     Integer newPaging = Input.getInteger("이동하실 페이지 번호를 입력해주세요 : ");
-                    if (newPaging != null && (newPaging - 1) >= 0 && (newPaging - 1) <= maxPage-1) {
+                    if (newPaging != null && (newPaging - 1) >= 0 && (newPaging - 1) <= maxPage - 1) {
                         page = newPaging - 1;
                         DataStore.setPage(page);
                     } else

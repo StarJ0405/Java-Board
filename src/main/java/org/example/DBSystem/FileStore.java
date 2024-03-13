@@ -1,6 +1,9 @@
-package org.example;
+package org.example.DBSystem;
 
-import org.example.FileSystem.YamlConfiguration;
+import org.example.Comment;
+import org.example.DataStore;
+import org.example.Member;
+import org.example.Post;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,10 +11,11 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-public class FileStore {
-    private static final File file = new File("./store.yml");
+public class FileStore extends DBStore {
+    private final File file = new File("./store.yml");
 
-    public static void setPost(String key, Post post) {
+    @Override
+    public void setPost(String key, Post post) {
         try {
             if (!file.exists()) file.createNewFile();
             YamlConfiguration yaml = new YamlConfiguration();
@@ -42,7 +46,8 @@ public class FileStore {
         }
     }
 
-    public static void setMember(String key, Member member) {
+    @Override
+    public void setMember(String key, Member member) {
         try {
             if (!file.exists()) file.createNewFile();
             YamlConfiguration yaml = new YamlConfiguration();
@@ -61,7 +66,8 @@ public class FileStore {
         }
     }
 
-    public static void loadAllData() {
+    @Override
+    public void loadAllData() {
         try {
             if (!file.exists()) file.createNewFile();
             YamlConfiguration yaml = new YamlConfiguration();
