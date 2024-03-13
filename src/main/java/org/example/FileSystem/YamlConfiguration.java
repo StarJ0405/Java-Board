@@ -181,4 +181,18 @@ public class YamlConfiguration {
         else
             return moveToKey(key).getString(getFinalKey(key));
     }
+
+    public boolean isBoolean(String key) {
+        if (!hasSpliter(key))
+            return map.get(key) instanceof Boolean;
+        else
+            return moveToKey(key).isString(getFinalKey(key));
+    }
+
+    public Boolean getBoolean(String key) {
+        if (!hasSpliter(key))
+            return (Boolean) map.get(key);
+        else
+            return moveToKey(key).getBoolean(getFinalKey(key));
+    }
 }

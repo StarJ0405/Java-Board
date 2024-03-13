@@ -5,28 +5,30 @@ import java.util.List;
 
 public class Main {
 
-
     public static void main(String[] args) {
-        initial();
+        FileStore.loadAllData();
         main:
         while (true) {
             Member who = DataStore.getWho();
-            String cmd = Input.getString("명령어를 입력해주세요" + (who != null ? "[" + who.getID() + "(" + who.getNickname() + ")]" : "") + " : ");
+            String cmd = Input.getString("명령어를 입력해주세요" + (who != null ? "[" + who.getNickname() + (who.isAdmin() ? "(관리자)" : "") + "]" : "") + " : ");
             switch (cmd.toLowerCase().replace(" ", "")) {
                 case "exit":
                     View.sendMessage("프로그램을 종료합니다.");
                     break main;
                 case "add":
-                    add();
+                    if (who != null) add();
+                    else View.sendConsoleErrorMessage();
                     break;
                 case "list":
                     list();
                     break;
                 case "update":
-                    update();
+                    if (who != null && who.isAdmin()) update(Input.getInteger("수정할 게시물 번호 : "));
+                    else View.sendConsoleErrorMessage();
                     break;
                 case "delete":
-                    delete();
+                    if (who != null && who.isAdmin()) delete(Input.getInteger("삭제할 게시물 번호 : "));
+                    else View.sendConsoleErrorMessage();
                     break;
                 case "detail":
                     detail();
@@ -41,46 +43,49 @@ public class Main {
                     login();
                     break;
                 case "logout":
-                    who = null;
-                    View.sendMessage("로그아웃에 성공했습니다.");
+                    if (who != null) {
+                        DataStore.setWho(null);
+                        View.sendMessage("로그아웃에 성공했습니다.");
+                    } else View.sendConsoleErrorMessage();
                     break;
                 case "help":
-                    View.sendMessage("add - 게시물 추가");
                     View.sendMessage("list - 게시물 목록");
-                    View.sendMessage("update - 게시물 수정");
-                    View.sendMessage("delete - 게시물 삭제");
-                    View.sendMessage("detail - 상세보기");
                     View.sendMessage("search - 게시물 찾기");
+                    View.sendMessage("detail - 상세보기");
+                    if (who != null) {
+                        View.sendMessage("add - 게시물 추가");
+                        if (who.isAdmin()) {
+                            View.sendMessage("update - 게시물 수정");
+                            View.sendMessage("delete - 게시물 삭제");
+                        }
+                        View.sendMessage("logout - 로그아웃");
+                    }
                     View.sendMessage("signup - 회원가입");
                     View.sendMessage("login - 로그인");
-                    View.sendMessage("logout - 로그아웃");
                     View.sendMessage("exit - 프로그램 종료");
                     break;
                 default:
-                    View.sendMessage("없는 명령어입니다. 다시 입력해주세요.");
-                    View.sendMessage("도움이 필요하면 help를 입력하세요.");
+                    View.sendConsoleErrorMessage();
                     break;
             }
         }
     }
 
 
-    private static void initial() {
-        FileStore.loadAllData();
-//        int num1 = DataStore.getEmptyNumber();
-//        DataStore.addPost(num1, new Post(num1, "안녕하세요 반갑습니다. 자바 공부중이에요.", "즐거운 자바시간"));
-//        int num2 = DataStore.getEmptyNumber();
-//        DataStore.addPost(num2, new Post(num2, "자바 질문좀 할게요~", "제곧내"));
-//        int num3 = DataStore.getEmptyNumber();
-//        DataStore.addPost(num3, new Post(num3, "정처기 따야되나요?", "역시 따는게 낫군여"));
-    }
-
     private static void add() {
-        String title = Input.getString("게시물 제목을 입력해주세요 : ");
-        String desc = Input.getString("게시물 내용을 입력해주세요 : ");
+        String title = Input.getString("게시물 제목을 입력해주세요(공백입력시 취소) : ");
+        if (title.equals("")) {
+            View.sendMessage("게시글 수정이 취소되었습니다.");
+            return;
+        }
+        String desc = Input.getString("게시물 내용을 입력해주세요(공백입력시 취소) : ");
+        if (desc.equals("")) {
+            View.sendMessage("게시글 수정이 취소되었습니다.");
+            return;
+        }
         View.sendMessage("게시물이 등록되었습니다.");
         int num = DataStore.getEmptyNumber();
-        Post post = new Post(num, title, desc);
+        Post post = new Post(num, DataStore.getWho().getID(), title, desc);
         DataStore.addPost(num, post);
         FileStore.setPost(num + "", post); // 추가
     }
@@ -91,33 +96,35 @@ public class Main {
             Post post = DataStore.getPost(i);
             View.sendMessage("번호 : " + i);
             View.sendMessage("제목 : " + post.getTitle());
-            View.sendMessage("등록날짜 : " + post.getDate().format(View.getDateTimeFormatter()));
+            View.sendMessage("작성일 : " + post.getDate().format(View.getDateTimeFormatter()));
+            View.sendMessage("작성자 : " + DataStore.getMember(post.getAuthor()).getNickname());
             View.sendMessage("==================");
         }
     }
 
-    private static void update() {
-        Integer num = Input.getInteger("수정할 게시물 번호 : ");
+    private static void update(Integer num) {
         if (num != null && DataStore.hasPost(num)) {
-            String title = Input.getString("제목 : ");
-            String desc = Input.getString("내용 : ");
+            String title = Input.getString("제목(공백입력시 기존값 유지) : ");
+            String desc = Input.getString("내용(공백입력시 기존값 유지) : ");
             Post post = DataStore.getPost(num);
-            post.setTitle(title);
-            post.setDescription(desc);
+            if (!title.equals(""))
+                post.setTitle(title);
+            if (!desc.equals(""))
+                post.setDescription(desc);
             FileStore.setPost(num + "", post); // 수정
             View.sendMessage(num + "번 게시물이 수정되었습니다.");
-        } else
-            View.sendMessage("없는 게시물 번호입니다.");
+        } else View.sendMessage("없는 게시물 번호입니다.");
     }
 
-    private static void delete() {
-        Integer num = Input.getInteger("삭제할 게시물 번호 : ");
-        if (DataStore.hasPost(num)) {
-            View.sendMessage(num + "번 게시물이 삭제되었습니다.");
-            DataStore.removePost(num);
-            FileStore.setPost(num + "", null); // 제거
-        } else
-            View.sendMessage("없는 게시물 번호입니다.");
+    private static void delete(Integer num) {
+        if (num != null && DataStore.hasPost(num)) {
+            Boolean check = Input.getBoolean("정말 게시물을 삭제하시겠습니까? (y/n) : ", "y", "n", true);
+            if (check != null && check) {
+                View.sendMessage(num + "번 게시물이 삭제되었습니다.");
+                DataStore.removePost(num);
+                FileStore.setPost(num + "", null); // 제거
+            } else View.sendMessage("게시글 삭제가 취소되었습니다.");
+        } else View.sendMessage("없는 게시물 번호입니다.");
     }
 
     private static void detail() {
@@ -140,11 +147,13 @@ public class Main {
                         View.sendMessage("[추천 기능]");
                         break;
                     case 3:
-                        View.sendMessage("[수정 기능]");
+                        if (post.getAuthor().equals(who.getID())) update(num);
+                        else View.sendMessage("자신의 게시물만 수정 할 수 있습니다.");
                         break;
                     case 4:
-                        View.sendMessage("[삭제 기능]");
-                        break;
+                        if (post.getAuthor().equals(who.getID())) delete(num);
+                        else View.sendMessage("자신의 게시물만 삭제 할 수 있습니다.");
+                        break sub;
                     case 5:
                         break sub;
                     default:
@@ -152,8 +161,7 @@ public class Main {
                         break;
                 }
             }
-        } else
-            View.sendMessage("없는 게시물 번호입니다.");
+        } else View.sendMessage("없는 게시물 번호입니다.");
     }
 
 
@@ -161,14 +169,12 @@ public class Main {
         String keyword = Input.getString("검색 키워드를 입력해주세요 : ");
         List<Post> list = new ArrayList<Post>();
         for (Post post : DataStore.getPosts())
-            if (post.getTitle().contains(keyword))
-                list.add(post);
-        if (list.size() > 0)
-            for (Post post : list) {
-                View.sendMessage("번호 : " + post.getNum());
-                View.sendMessage("제목 : " + post.getTitle());
-                View.sendMessage("==================");
-            }
+            if (post.getTitle().contains(keyword)) list.add(post);
+        if (list.size() > 0) for (Post post : list) {
+            View.sendMessage("번호 : " + post.getNum());
+            View.sendMessage("제목 : " + post.getTitle());
+            View.sendMessage("==================");
+        }
         else {
             View.sendMessage("==================");
             View.sendMessage("검색 결과가 없습니다.");
