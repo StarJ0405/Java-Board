@@ -5,6 +5,8 @@ import org.example.FileSystem.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 public class FileStore {
     private static final File file = new File("./store.yml");
@@ -24,6 +26,16 @@ public class FileStore {
                 postYaml.set("description", post.getDescription());
                 postYaml.set("date", post.getDate().toString());
                 postYaml.set("show", post.getShow());
+                YamlConfiguration commentsYaml = postYaml.getConfigurationSection("comments");
+                List<Comment> comments = post.getComments();
+                for (int i = 0; i < comments.size(); i++) {
+                    YamlConfiguration commentYaml = commentsYaml.getConfigurationSection(i + "");
+                    Comment comment = comments.get(i);
+                    commentYaml.set("author", comment.getAuthor());
+                    commentYaml.set("content", comment.getContent());
+                    commentYaml.set("date", comment.getDate().toString());
+                }
+                postYaml.set("loves", Arrays.asList(post.getLoves().toArray(String[]::new)));
             }
             yaml.save(file);
         } catch (IOException e) {
@@ -61,7 +73,20 @@ public class FileStore {
                     YamlConfiguration postYaml = postsYaml.getConfigurationSection(postKey);
                     if (postYaml.isInteger("number") && postYaml.isString("author") && postYaml.isString("title") && postYaml.isString("description") && postYaml.isString("date") && postYaml.isInteger("show")) {
                         int number = postYaml.getInteger("number");
-                        DataStore.addPost(number, new Post(number, postYaml.getString("author"), postYaml.getString("title"), postYaml.getString("description"), LocalDateTime.parse(postYaml.getString("date")), postYaml.getInteger("show")));
+                        Post post = new Post(number, postYaml.getString("author"), postYaml.getString("title"), postYaml.getString("description"), LocalDateTime.parse(postYaml.getString("date")), postYaml.getInteger("show"));
+                        DataStore.addPost(number, post);
+                        if (postYaml.isConfigurationSection("comments")) {
+                            YamlConfiguration commentsYaml = postYaml.getConfigurationSection("comments");
+                            List<Comment> comments = post.getComments();
+                            for (String numKey : commentsYaml.keySet())
+                                if (commentsYaml.isConfigurationSection(numKey)) {
+                                    YamlConfiguration commentYaml = commentsYaml.getConfigurationSection(numKey);
+                                    if (commentYaml.isString("author") && commentYaml.isString("content") && commentYaml.isString("date"))
+                                        comments.add(new Comment(commentYaml.getString("author"), commentYaml.getString("content"), LocalDateTime.parse(commentYaml.getString("date"))));
+                                }
+                        }
+                        if (postYaml.isList("loves"))
+                            post.getLoves().addAll(postYaml.getStringList("loves"));
                     }
                 }
             // 멤버

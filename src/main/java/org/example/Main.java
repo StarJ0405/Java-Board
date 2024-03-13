@@ -2,6 +2,7 @@ package org.example;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Main {
 
@@ -31,7 +32,7 @@ public class Main {
                     else View.sendConsoleErrorMessage();
                     break;
                 case "detail":
-                    detail();
+                    detail(Input.getInteger("상세보기 할 게시물 번호를 입력해주세요 : "));
                     break;
                 case "search":
                     search();
@@ -127,33 +128,50 @@ public class Main {
         } else View.sendMessage("없는 게시물 번호입니다.");
     }
 
-    private static void detail() {
-        Integer num = Input.getInteger("상세보기 할 게시물 번호를 입력해주세요 : ");
+    private static void detail(Integer num) {
         if (num != null && DataStore.hasPost(num)) {
             Post post = DataStore.getPost(num);
-            post.show();
-            FileStore.setPost(num + "", post); // 조회수 변경
             Member who = DataStore.getWho();
+            post.show(who);
+            FileStore.setPost(num + "", post); // 조회수 변경
             sub:
             while (who != null) {
-                Integer num2 = Input.getInteger("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 추천, 3. 수정, 4. 삭제, 5. 목록으로) : ");
+                Integer num2 = Optional.ofNullable(Input.getInteger("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ")).orElse(-1);
                 switch (num2) {
                     case 1:
-                        String comment = Input.getString("댓글 내용 : ");
-                        post.addComments(comment);
+                        String comment = Input.getString("댓글 내용(공백 입력시 취소) : ");
+                        if (comment.equals("")) {
+                            View.sendMessage("댓글 입력이 취소되었습니다.");
+                            break;
+                        }
+                        post.addComments(who.getID(), comment);
                         View.sendMessage("댓글이 성공적으로 등록되었습니다");
-                        break;
+                        detail(num);
+                        break sub;
                     case 2:
-                        View.sendMessage("[추천 기능]");
-                        break;
+                        if (post.getLoves().contains(who.getID())) {
+                            View.sendMessage("해당 게시물의 좋아요를 해제합니다.");
+                            post.getLoves().remove(who.getID());
+                        } else {
+                            View.sendMessage("해당 게시물을 좋아합니다.");
+                            post.getLoves().add(who.getID());
+                        }
+                        FileStore.setPost(num + "", post);
+                        detail(num);
+                        break sub;
                     case 3:
-                        if (post.getAuthor().equals(who.getID())) update(num);
-                        else View.sendMessage("자신의 게시물만 수정 할 수 있습니다.");
+                        if (post.getAuthor().equals(who.getID())) {
+                            update(num);
+                            detail(num);
+                            break sub;
+                        } else View.sendMessage("자신의 게시물만 수정 할 수 있습니다.");
                         break;
                     case 4:
-                        if (post.getAuthor().equals(who.getID())) delete(num);
-                        else View.sendMessage("자신의 게시물만 삭제 할 수 있습니다.");
-                        break sub;
+                        if (post.getAuthor().equals(who.getID())) {
+                            delete(num);
+                            break sub;
+                        } else View.sendMessage("자신의 게시물만 삭제 할 수 있습니다.");
+                        break;
                     case 5:
                         break sub;
                     default:

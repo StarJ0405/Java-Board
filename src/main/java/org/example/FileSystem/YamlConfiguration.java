@@ -195,4 +195,32 @@ public class YamlConfiguration {
         else
             return moveToKey(key).getBoolean(getFinalKey(key));
     }
+
+    public boolean isList(String key) {
+        if (!hasSpliter(key))
+            return map.get(key) instanceof List;
+        else
+            return moveToKey(key).isList(getFinalKey(key));
+    }
+
+    public List<?> getList(String key) {
+        if (!hasSpliter(key))
+            return (List<?>) map.get(key);
+        else
+            return moveToKey(key).getList(getFinalKey(key));
+    }
+
+    public List<String> getStringList(String key) {
+        if (!hasSpliter(key))
+            return (List<String>) map.get(key);
+        else
+            return moveToKey(key).getStringList(getFinalKey(key));
+    }
+    public List<Integer> getIntegerList(String key) {
+        if (!hasSpliter(key))
+            return (List<Integer>) map.get(key);
+        else
+            return moveToKey(key).getIntegerList(getFinalKey(key));
+    }
+
 }

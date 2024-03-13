@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ public class Post {
     private LocalDateTime date;
     private int show;
     private List<Comment> comments;
+    private HashSet<String> loves;
 
     public Post(int num, String author, String title, String description) {
         this(num, author, title, description, LocalDateTime.now(), 0);
@@ -31,7 +33,8 @@ public class Post {
         this.description = description;
         this.date = Optional.ofNullable(date).orElse(LocalDateTime.now());
         this.show = Optional.ofNullable(show).orElse(0);
-        this.comments = new ArrayList<Comment>();
+        this.comments = new ArrayList<>();
+        this.loves = new HashSet<>();
     }
 
     public int getNum() {
@@ -66,7 +69,7 @@ public class Post {
         return show;
     }
 
-    public void show() {
+    public void show(Member who) {
         this.show++;
         View.sendMessage("==================");
         View.sendMessage("번호 : " + this.num);
@@ -75,11 +78,13 @@ public class Post {
         View.sendMessage("작성일 :" + this.date.format(View.getDateTimeFormatter()));
         View.sendMessage("작성자 : " + DataStore.getMember(this.author).getNickname());
         View.sendMessage("조회수 : " + this.show);
+        View.sendMessage("좋아요 : " + (who != null && loves.contains(who.getID()) ? "♥ " : "♡ ") + loves.size());
         View.sendMessage("==================");
         if (comments.size() > 0) {
             View.sendMessage("=======댓글=======");
             for (Comment comment : comments) {
                 View.sendMessage("댓글 내용 : " + comment.getContent());
+                View.sendMessage("작성자 : " + DataStore.getMember(comment.getAuthor()).getNickname());
                 View.sendMessage("댓글 작성일 : " + comment.getDate().format(View.getDateTimeFormatter()));
                 View.sendMessage("==================");
             }
@@ -90,11 +95,15 @@ public class Post {
         return comments;
     }
 
-    public void addComments(String comment) {
-        addComments(new Comment(comment));
+    public void addComments(String author, String comment) {
+        addComments(new Comment(author, comment));
     }
 
     public void addComments(Comment comment) {
         this.comments.add(comment);
+    }
+
+    public HashSet<String> getLoves() {
+        return loves;
     }
 }

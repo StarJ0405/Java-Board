@@ -3,8 +3,8 @@ package org.example;
 import java.util.*;
 
 public class DataStore {
-    private static final LinkedHashMap<Integer, Post> posts = new LinkedHashMap<Integer, Post>();
-    private static final HashMap<String, Member> members = new HashMap<String, Member>();
+    private static final LinkedHashMap<Integer, Post> posts = new LinkedHashMap<>();
+    private static final HashMap<String, Member> members = new HashMap<>();
 
     private static Member who = null;
 
