@@ -3,10 +3,7 @@ package org.example.FileSystem;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class YamlConfiguration {
     private final Yaml yaml;
@@ -64,7 +61,10 @@ public class YamlConfiguration {
 
     public <T> void set(String key, T value) {
         if (!hasSpliter(key))
-            map.put(key, value);
+            if (value == null)
+                map.remove(key);
+            else
+                map.put(key, value);
         else
             moveToKey(key).set(getFinalKey(key), value);
     }
@@ -82,6 +82,14 @@ public class YamlConfiguration {
             }
         } else
             return moveToKey(key).getConfigurationSection(getFinalKey(key));
+    }
+
+    public boolean isConfigurationSection(String key) {
+        if (!hasSpliter(key)) {
+            Object data = this.map.get(key);
+            return data != null && data instanceof HashMap;
+        } else
+            return moveToKey(key).isConfigurationSection(getFinalKey(key));
     }
 
     private boolean hasSpliter(String key) {
@@ -108,5 +116,69 @@ public class YamlConfiguration {
         }
         YamlConfiguration yaml = new YamlConfiguration(nowMap, this.parent);
         return yaml;
+    }
+
+    public Set<String> keySet() {
+        return map.keySet();
+    }
+
+    public Collection<Object> values() {
+        return map.values();
+    }
+
+    public boolean isInteger(String key) {
+        if (!hasSpliter(key))
+            return map.get(key) instanceof Integer;
+        else
+            return moveToKey(key).isInteger(getFinalKey(key));
+    }
+
+    public Integer getInteger(String key) {
+        if (!hasSpliter(key))
+            return (Integer) map.get(key);
+        else
+            return moveToKey(key).getInteger(getFinalKey(key));
+    }
+
+    public boolean isLong(String key) {
+        if (!hasSpliter(key))
+            return map.get(key) instanceof Long;
+        else
+            return moveToKey(key).isLong(getFinalKey(key));
+    }
+
+    public Long getLong(String key) {
+        if (!hasSpliter(key))
+            return (Long) map.get(key);
+        else
+            return moveToKey(key).getLong(getFinalKey(key));
+    }
+
+    public boolean isDouble(String key) {
+        if (!hasSpliter(key))
+            return map.get(key) instanceof Double;
+        else
+            return moveToKey(key).isDouble(getFinalKey(key));
+    }
+
+    public Double getDouble(String key) {
+        if (!hasSpliter(key))
+            return (Double) map.get(key);
+        else
+            return moveToKey(key).getDouble(getFinalKey(key));
+    }
+
+    public boolean isString(String key) {
+        if (!hasSpliter(key))
+            return map.get(key) instanceof String;
+        else
+            return moveToKey(key).isString(getFinalKey(key));
+    }
+
+    public String getString(String key) {
+        if (!hasSpliter(key))
+            return (String) map.get(key);
+        else
+            return moveToKey(key).getString(getFinalKey(key));
     }
 }

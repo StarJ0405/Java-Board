@@ -1,1 +1,9 @@
-{save: true}
+posts:
+  '1': {number: 1, title: 안녕하세요 반갑습니다. 자바 공부중이에요., description: 자바 공부는 어려워, date: '2024-03-13T10:06:45.859387900',
+    show: 0}
+  '2': {number: 2, title: 자바 질문좀 할게요~, description: 질문은 GPT 혹은 지미니에게!, date: '2024-03-13T10:06:58.754782800',
+    show: 0}
+  '3': {number: 3, title: '정처기 따야되나요?', description: '있으면 좋겠죠?', date: '2024-03-13T10:07:15.705439500',
+    show: 0}
+members:
+  admin: {id: admin, password: admin, nickname: admin}

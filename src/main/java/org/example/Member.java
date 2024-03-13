@@ -11,12 +11,16 @@ public class Member {
         this.nickname = nickname;
     }
 
-    public String getId() {
+    public String getID() {
         return id;
     }
 
     public String getNickname() {
         return nickname;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public boolean checkPassword(String password) {

@@ -1,6 +1,5 @@
 package org.example;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,7 @@ public class Main {
         main:
         while (true) {
             Member who = DataStore.getWho();
-            String cmd = Input.getString("명령어를 입력해주세요" + (who != null ? "[" + who.getId() + "(" + who.getNickname() + ")]" : "") + " : ");
+            String cmd = Input.getString("명령어를 입력해주세요" + (who != null ? "[" + who.getID() + "(" + who.getNickname() + ")]" : "") + " : ");
             switch (cmd.toLowerCase().replace(" ", "")) {
                 case "exit":
                     View.sendMessage("프로그램을 종료합니다.");
@@ -45,14 +44,21 @@ public class Main {
                     who = null;
                     View.sendMessage("로그아웃에 성공했습니다.");
                     break;
-                case "test":
-                    FileStore.saveData("save", true);
-                    break;
-                case "test2":
-                    FileStore.loadData("save");
+                case "help":
+                    View.sendMessage("add - 게시물 추가");
+                    View.sendMessage("list - 게시물 목록");
+                    View.sendMessage("update - 게시물 수정");
+                    View.sendMessage("delete - 게시물 삭제");
+                    View.sendMessage("detail - 상세보기");
+                    View.sendMessage("search - 게시물 찾기");
+                    View.sendMessage("signup - 회원가입");
+                    View.sendMessage("login - 로그인");
+                    View.sendMessage("logout - 로그아웃");
+                    View.sendMessage("exit - 프로그램 종료");
                     break;
                 default:
                     View.sendMessage("없는 명령어입니다. 다시 입력해주세요.");
+                    View.sendMessage("도움이 필요하면 help를 입력하세요.");
                     break;
             }
         }
@@ -60,12 +66,13 @@ public class Main {
 
 
     private static void initial() {
-        int num1 = DataStore.getEmptyNumber();
-        DataStore.addPost(num1, new Post(num1, "안녕하세요 반갑습니다. 자바 공부중이에요.", "즐거운 자바시간"));
-        int num2 = DataStore.getEmptyNumber();
-        DataStore.addPost(num2, new Post(num2, "자바 질문좀 할게요~", "제곧내"));
-        int num3 = DataStore.getEmptyNumber();
-        DataStore.addPost(num3, new Post(num3, "정처기 따야되나요?", "역시 따는게 낫군여"));
+        FileStore.loadAllData();
+//        int num1 = DataStore.getEmptyNumber();
+//        DataStore.addPost(num1, new Post(num1, "안녕하세요 반갑습니다. 자바 공부중이에요.", "즐거운 자바시간"));
+//        int num2 = DataStore.getEmptyNumber();
+//        DataStore.addPost(num2, new Post(num2, "자바 질문좀 할게요~", "제곧내"));
+//        int num3 = DataStore.getEmptyNumber();
+//        DataStore.addPost(num3, new Post(num3, "정처기 따야되나요?", "역시 따는게 낫군여"));
     }
 
     private static void add() {
@@ -73,7 +80,9 @@ public class Main {
         String desc = Input.getString("게시물 내용을 입력해주세요 : ");
         View.sendMessage("게시물이 등록되었습니다.");
         int num = DataStore.getEmptyNumber();
-        DataStore.addPost(num, new Post(num, title, desc));
+        Post post = new Post(num, title, desc);
+        DataStore.addPost(num, post);
+        FileStore.setPost(num + "", post); // 추가
     }
 
     private static void list() {
@@ -82,7 +91,7 @@ public class Main {
             Post post = DataStore.getPost(i);
             View.sendMessage("번호 : " + i);
             View.sendMessage("제목 : " + post.getTitle());
-            View.sendMessage("등록날짜 : " + post.getDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd hh:mm:ss")));
+            View.sendMessage("등록날짜 : " + post.getDate().format(View.getDateTimeFormatter()));
             View.sendMessage("==================");
         }
     }
@@ -95,6 +104,7 @@ public class Main {
             Post post = DataStore.getPost(num);
             post.setTitle(title);
             post.setDescription(desc);
+            FileStore.setPost(num + "", post); // 수정
             View.sendMessage(num + "번 게시물이 수정되었습니다.");
         } else
             View.sendMessage("없는 게시물 번호입니다.");
@@ -105,6 +115,7 @@ public class Main {
         if (DataStore.hasPost(num)) {
             View.sendMessage(num + "번 게시물이 삭제되었습니다.");
             DataStore.removePost(num);
+            FileStore.setPost(num + "", null); // 제거
         } else
             View.sendMessage("없는 게시물 번호입니다.");
     }
@@ -114,6 +125,7 @@ public class Main {
         if (num != null && DataStore.hasPost(num)) {
             Post post = DataStore.getPost(num);
             post.show();
+            FileStore.setPost(num + "", post); // 조회수 변경
             Member who = DataStore.getWho();
             sub:
             while (who != null) {
@@ -174,7 +186,9 @@ public class Main {
         String password = Input.getString("비밀번호를 입력해주세요 : ");
         String nickname = Input.getString("닉네임을 입력해주세요 : ");
         View.sendMessage("==== 회원 가입이 완료됐습니다 ====");
-        DataStore.addMember(id, new Member(id, password, nickname));
+        Member member = new Member(id, password, nickname);
+        DataStore.addMember(id, member);
+        FileStore.setMember(id, member);
     }
 
     private static void login() {
