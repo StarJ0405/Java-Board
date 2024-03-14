@@ -35,7 +35,7 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="85800211-2c15-43b5-984b-6086e0f35e05">
-      <console name="console" type="STANDARD" schema="java_board" session="Main" />
+      <console name="console" type="STANDARD" schema="java_board" session="Main"><![CDATA[select * from member;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">

@@ -17,18 +17,6 @@ public class mySQLStore extends DBStore {
         super("mySQL");
     }
 
-    public void connect() throws SQLException {
-        Connection connection = DriverManager.getConnection(url, userName, password);
-//
-//        Statement statement = connection.createStatement();
-//        ResultSet resultSet = statement.executeQuery("select * from users");
-//        resultSet.next();
-//        String name = resultSet.getString("name");
-//        System.out.println(name);
-//        resultSet.close();
-//        statement.close();
-//        connection.close();
-    }
 
     private void saveQuery(Connection connection, Statement statement, String query, WrapValue... wrapValues) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -42,16 +30,16 @@ public class mySQLStore extends DBStore {
         try {
             Connection connection = DriverManager.getConnection(url, userName, password);
             Statement statement = connection.createStatement();
-            // 포스터
-            saveQuery(connection, statement, "INSERT INTO post(number, id, title, description, date, _show) values(?,?,?,?,?,?) ON DUPLICATE KEY UPDATE number=?, id=?, title=?, description=?, date=?, _show=?", WrapValue.getInt(post.getNum(), 1, 7), WrapValue.getString(post.getAuthor(), 2, 8), WrapValue.getString(post.getTitle(), 3, 9), WrapValue.getString(post.getDescription(), 4, 10), WrapValue.getString(post.getDate().toString(), 5, 11), WrapValue.getInt(post.getShow(), 6, 12));
+            // 게시글
+            saveQuery(connection, statement, SQLQuery.POST_INSERT, WrapValue.getInt(post.getNum(), 1, 7), WrapValue.getString(post.getAuthor(), 2, 8), WrapValue.getString(post.getTitle(), 3, 9), WrapValue.getString(post.getDescription(), 4, 10), WrapValue.getString(post.getDate().toString(), 5, 11), WrapValue.getInt(post.getShow(), 6, 12));
             // 댓글
-            saveQuery(connection, statement, "DELETE FROM comment where number= ?", WrapValue.getInt(post.getNum(), 1));
+            saveQuery(connection, statement, SQLQuery.COMMENT_DELETE, WrapValue.getInt(post.getNum(), 1));
             for (Comment comment : post.getComments())
-                saveQuery(connection, statement, "INSERT INTO comment(id,date,number,content) values (?,?,?,?) ON DUPLICATE KEY UPDATE id=?, date=?, number=?,content=?", WrapValue.getString(comment.getAuthor(), 1, 5), WrapValue.getString(comment.getDate().toString(), 2, 6), WrapValue.getInt(post.getNum(), 3, 7), WrapValue.getString(comment.getContent(), 4, 8));
+                saveQuery(connection, statement, SQLQuery.COMMENT_INSERT, WrapValue.getString(comment.getAuthor(), 1, 5), WrapValue.getString(comment.getDate().toString(), 2, 6), WrapValue.getInt(post.getNum(), 3, 7), WrapValue.getString(comment.getContent(), 4, 8));
             // 좋아요
-            saveQuery(connection, statement, "DELETE FROM love where number= ?", WrapValue.getInt(post.getNum(), 1));
+            saveQuery(connection, statement, SQLQuery.LOVE_DELETE, WrapValue.getInt(post.getNum(), 1));
             for (String love : post.getLoves())
-                saveQuery(connection, statement, "INSERT INTO love(number,id) values(?,?) ON DUPLICATE KEY UPDATE number=?,id=?", WrapValue.getInt(post.getNum(), 1, 3), WrapValue.getString(post.getAuthor(), 2, 4));
+                saveQuery(connection, statement, SQLQuery.LOVE_INSERT, WrapValue.getInt(post.getNum(), 1, 3), WrapValue.getString(post.getAuthor(), 2, 4));
             statement.close();
             connection.close();
 
@@ -65,7 +53,7 @@ public class mySQLStore extends DBStore {
         try {
             Connection connection = DriverManager.getConnection(url, userName, password);
             Statement statement = connection.createStatement();
-            saveQuery(connection, statement, "INSERT INTO member(id, password, nickname,admin) values(?,?,?,?)  ON DUPLICATE KEY UPDATE id=?, password=?, nickname=?, admin=?", WrapValue.getString(member.getID(), 1, 5), WrapValue.getString(member.getPassword(), 2, 6), WrapValue.getString(member.getNickname(), 3, 7), WrapValue.getInt(member.isAdmin(), 4, 8));
+            saveQuery(connection, statement, SQLQuery.MEMBER_INSERT, WrapValue.getString(member.getID(), 1, 5), WrapValue.getString(member.getPassword(), 2, 6), WrapValue.getString(member.getNickname(), 3, 7), WrapValue.getInt(member.isAdmin(), 4, 8));
             statement.close();
             connection.close();
         } catch (SQLException e) {
@@ -85,8 +73,8 @@ public class mySQLStore extends DBStore {
         try {
             Connection connection = DriverManager.getConnection(url, userName, password);
             Statement statement = connection.createStatement();
-            // 포스터
-            ResultSet postResult = loadQuery(connection, statement, "select * from post");
+            // 게시글
+            ResultSet postResult = loadQuery(connection, statement, SQLQuery.POST_SELECT);
             while (postResult.next()) {
                 int number = postResult.getInt("number");
                 String author = postResult.getString("id");
@@ -97,7 +85,7 @@ public class mySQLStore extends DBStore {
                 Post post = new Post(number, author, title, description, date, show);
                 DataStore.addPost(number, post);
                 // 댓글
-                ResultSet commentResult = loadQuery(connection, statement, "select * from comment where number=?", WrapValue.getInt(number, 1));
+                ResultSet commentResult = loadQuery(connection, statement, SQLQuery.COMMENT_SELECT, WrapValue.getInt(number, 1));
                 while (commentResult.next()) {
                     String commentAuthor = commentResult.getString("id");
                     String commentContent = commentResult.getString("content");
@@ -106,13 +94,13 @@ public class mySQLStore extends DBStore {
                 }
                 commentResult.close();
                 // 좋아요
-                ResultSet loveResult = loadQuery(connection, statement, "select * from love where number=?", WrapValue.getInt(number, 1));
+                ResultSet loveResult = loadQuery(connection, statement, SQLQuery.LOVE_SELECT, WrapValue.getInt(number, 1));
                 while (loveResult.next()) post.addLoves(loveResult.getString("id"));
                 loveResult.close();
             }
             postResult.close();
             // 멤버
-            ResultSet memberResult = loadQuery(connection, statement, "select * from member");
+            ResultSet memberResult = loadQuery(connection, statement, SQLQuery.MEMBER_SELECT);
             while (memberResult.next()) {
                 String id = memberResult.getString("id");
                 String password = memberResult.getString("password");
@@ -135,10 +123,10 @@ public class mySQLStore extends DBStore {
         try {
             Connection connection = DriverManager.getConnection(url, userName, password);
             Statement statement = connection.createStatement();
-            saveQuery(connection, statement, "delete from love");
-            saveQuery(connection, statement, "delete from comment");
-            saveQuery(connection, statement, "delete from post");
-            saveQuery(connection, statement, "delete from member");
+            saveQuery(connection, statement, SQLQuery.LOVE_DELETE_ALL);
+            saveQuery(connection, statement, SQLQuery.COMMENT_DELETE_ALL);
+            saveQuery(connection, statement, SQLQuery.POST_DELETE_ALL);
+            saveQuery(connection, statement, SQLQuery.MEMBER_DELETE_ALL);
             statement.close();
             connection.close();
         } catch (SQLException e) {
