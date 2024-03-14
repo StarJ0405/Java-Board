@@ -13,7 +13,9 @@ import java.util.List;
 
 public class FileStore extends DBStore {
     private final File file = new File("./store.yml");
-
+    protected FileStore() {
+        super("file");
+    }
     @Override
     public void setPost(String key, Post post) {
         try {
@@ -110,4 +112,5 @@ public class FileStore extends DBStore {
         } catch (IOException e) {
         }
     }
+
 }

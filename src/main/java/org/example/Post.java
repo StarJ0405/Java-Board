@@ -106,4 +106,29 @@ public class Post {
     public HashSet<String> getLoves() {
         return loves;
     }
+
+    public void addLoves(Member who) {
+        addLoves(who.getID());
+    }
+
+    public void addLoves(String who) {
+        loves.add(who);
+    }
+
+    public boolean hasLoves(Member who) {
+        return hasLoves(who.getID());
+    }
+
+    public boolean hasLoves(String who) {
+        return loves.contains(who);
+    }
+
+    public void removeLoves(Member who) {
+        removeLoves(who.getID());
+    }
+
+    public void removeLoves(String who) {
+        loves.remove(who);
+    }
+
 }

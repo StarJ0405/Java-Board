@@ -1,7 +1,7 @@
 package org.example;
 
 import org.example.DBSystem.DBStore;
-import org.example.DBSystem.mySQLStore;
+import org.example.DBSystem.FileStore;
 
 import java.util.*;
 
@@ -10,7 +10,7 @@ public class DataStore {
     private static final HashMap<String, Member> members = new HashMap<>();
 
     private static Member who = null;
-    private static DBStore db = new mySQLStore();//new FileStore();
+    private static DBStore db = DBStore.checkDBStore();
 
     //
 
@@ -68,6 +68,10 @@ public class DataStore {
         return null;
     }
 
+    public static Collection<Member> getMembers() {
+        return members.values();
+    }
+
     public static Member getWho() {
         return who;
     }
@@ -88,7 +92,11 @@ public class DataStore {
         return db;
     }
 
-    public static void setDb(DBStore db) {
-        DataStore.db = db;
+    public static DBStore changeDb() {
+        if (db instanceof FileStore)
+            db = DBStore.MY_SQL_STORE;
+        else
+            db = DBStore.FILE_STORE;
+        return db;
     }
 }

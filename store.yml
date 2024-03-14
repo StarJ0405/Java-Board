@@ -8,10 +8,25 @@ posts:
     author: user
     comments:
       '0': {author: user2, content: 신기한 댓글기능, date: '2024-03-13T11:47:48.248280400'}
-  '2': {number: 2, title: 자바 질문좀 할게요~, description: 질문은 GPT 혹은 지미니에게!, date: '2024-03-13T10:06:58.754782800',
-    show: 0, author: user}
-  '3': {number: 3, title: '정처기 따야되나요?', description: '있으면 좋겠죠?', date: '2024-03-13T10:07:15.705439500',
-    show: 0, author: user}
+    loves: []
+  '2':
+    number: 2
+    title: 자바 질문좀 할게요~
+    description: 질문은 GPT 혹은 지미니에게!
+    date: '2024-03-13T10:06:58.754782800'
+    show: 0
+    author: user
+    comments: {}
+    loves: []
+  '3':
+    number: 3
+    title: 정처기 따야되나요?
+    description: 있으면 좋겠죠?
+    date: '2024-03-13T10:07:15.705439500'
+    show: 0
+    author: user
+    comments: {}
+    loves: []
   '4':
     number: 4
     author: user2
@@ -20,7 +35,7 @@ posts:
     date: '2024-03-13T12:51:18.394941700'
     show: 16
     comments: {}
-    loves: [user]
+    loves: [user2]
 members:
   admin: {id: admin, password: admin, nickname: 어드민, admin: true}
   user: {id: user, password: user, nickname: 유저}

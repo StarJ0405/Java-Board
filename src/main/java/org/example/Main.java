@@ -1,6 +1,9 @@
 package org.example;
 
 
+import org.example.DBSystem.DBStore;
+
+import javax.xml.crypto.Data;
 import java.util.*;
 
 public class Main {
@@ -58,6 +61,7 @@ public class Main {
                         if (who.isAdmin()) {
                             View.sendMessage("update - 게시물 수정");
                             View.sendMessage("delete - 게시물 삭제");
+                            View.sendMessage("transfer - 저장 방식 변경");
                         }
                         View.sendMessage("logout - 로그아웃");
                     }
@@ -70,6 +74,11 @@ public class Main {
                     break;
                 case "page":
                     page();
+                    break;
+                case "transfer":
+                    if (who != null && who.isAdmin())
+                        transfer();
+                    else View.sendConsoleErrorMessage();
                     break;
                 default:
                     View.sendConsoleErrorMessage();
@@ -155,12 +164,12 @@ public class Main {
                         detail(num);
                         break sub;
                     case 2:
-                        if (post.getLoves().contains(who.getID())) {
+                        if (post.hasLoves(who)) {
+                            post.removeLoves(who);
                             View.sendMessage("해당 게시물의 좋아요를 해제합니다.");
-                            post.getLoves().remove(who.getID());
                         } else {
+                            post.addLoves(who);
                             View.sendMessage("해당 게시물을 좋아합니다.");
-                            post.getLoves().add(who.getID());
                         }
                         DataStore.getDb().setPost(num + "", post);
                         detail(num);
@@ -233,7 +242,7 @@ public class Main {
 
     private static void login() {
         if (DataStore.getWho() != null) {
-            View.sendMessage("이미 로그인 중입니다. 로그아웃을 시도해주세요.");
+            View.sendMessage("이미 로그인 중입니다. 로그아웃을 먼저 시도해주세요.");
             return;
         }
         String id = Input.getString("아이디 : ");
@@ -312,5 +321,16 @@ public class Main {
 
             }
         }
+    }
+
+    private static void transfer() {
+        View.sendMessage("현재 저장 방식 : " + DataStore.getDb().getSaveType());
+        Boolean value = Input.getBoolean("변경하시겠습니까? (y/n) : ", "y", "n", true);
+        if (value != null && value) {
+            DBStore db = DataStore.changeDb();
+            db.transferedFromOthers();
+            View.sendMessage("성공적으로 변경되었습니다.");
+        } else
+            View.sendMessage("변경이 취소되었습니다.");
     }
 }
