@@ -22,26 +22,43 @@ public class FileStore extends DBStore {
             if (!file.exists()) file.createNewFile();
             YamlConfiguration yaml = new YamlConfiguration();
             yaml.load(file);
-            YamlConfiguration postsYaml = yaml.getConfigurationSection("posts");
-            if (post == null) postsYaml.set(key, null);
+//            YamlConfiguration postsYaml = yaml.getConfigurationSection("posts");
+//            if (post == null) postsYaml.set(key, null);
+//            else {
+//                YamlConfiguration postYaml = postsYaml.getConfigurationSection(key);
+//                postYaml.set("number", post.getNum());
+//                postYaml.set("author", post.getAuthor());
+//                postYaml.set("title", post.getTitle());
+//                postYaml.set("description", post.getDescription());
+//                postYaml.set("date", post.getDate().toString());
+//                postYaml.set("show", post.getShow());
+//                YamlConfiguration commentsYaml = postYaml.getConfigurationSection("comments");
+//                List<Comment> comments = post.getComments();
+//                for (int i = 0; i < comments.size(); i++) {
+//                    YamlConfiguration commentYaml = commentsYaml.getConfigurationSection(i + "");
+//                    Comment comment = comments.get(i);
+//                    commentYaml.set("author", comment.getAuthor());
+//                    commentYaml.set("content", comment.getContent());
+//                    commentYaml.set("date", comment.getDate().toString());
+//                }
+//                postYaml.set("loves", Arrays.asList(post.getLoves().toArray(String[]::new)));
+//            }
+            if (post == null) yaml.set("posts."+key, null);
             else {
-                YamlConfiguration postYaml = postsYaml.getConfigurationSection(key);
-                postYaml.set("number", post.getNum());
-                postYaml.set("author", post.getAuthor());
-                postYaml.set("title", post.getTitle());
-                postYaml.set("description", post.getDescription());
-                postYaml.set("date", post.getDate().toString());
-                postYaml.set("show", post.getShow());
-                YamlConfiguration commentsYaml = postYaml.getConfigurationSection("comments");
+                yaml.set("posts."+key+".number", post.getNum());
+                yaml.set("posts."+key+".author", post.getAuthor());
+                yaml.set("posts."+key+".title", post.getTitle());
+                yaml.set("posts."+key+".description", post.getDescription());
+                yaml.set("posts."+key+".date", post.getDate().toString());
+                yaml.set("posts."+key+".show", post.getShow());
                 List<Comment> comments = post.getComments();
                 for (int i = 0; i < comments.size(); i++) {
-                    YamlConfiguration commentYaml = commentsYaml.getConfigurationSection(i + "");
                     Comment comment = comments.get(i);
-                    commentYaml.set("author", comment.getAuthor());
-                    commentYaml.set("content", comment.getContent());
-                    commentYaml.set("date", comment.getDate().toString());
+                    yaml.set("posts."+key+".comments."+i+".author", comment.getAuthor());
+                    yaml.set("posts."+key+".comments."+i+".content", comment.getContent());
+                    yaml.set("posts."+key+".comments."+i+".date", comment.getDate().toString());
                 }
-                postYaml.set("loves", Arrays.asList(post.getLoves().toArray(String[]::new)));
+                yaml.set("posts."+key+".loves", Arrays.asList(post.getLoves().toArray(String[]::new)));
             }
             yaml.save(file);
         } catch (IOException e) {
@@ -54,14 +71,21 @@ public class FileStore extends DBStore {
             if (!file.exists()) file.createNewFile();
             YamlConfiguration yaml = new YamlConfiguration();
             yaml.load(file);
-            YamlConfiguration membersYaml = yaml.getConfigurationSection("members");
-            if (member == null) membersYaml.set(key, null);
+//            YamlConfiguration membersYaml = yaml.getConfigurationSection("members");
+//            if (member == null) membersYaml.set(key, null);
+//            else {
+//                YamlConfiguration memberYaml = membersYaml.getConfigurationSection(key);
+//                memberYaml.set("id", member.getID());
+//                memberYaml.set("password", member.getPassword());
+//                memberYaml.set("nickname", member.getNickname());
+//                if (member.isAdmin()) memberYaml.set("admin", true);
+//            }
+            if (member == null) yaml.set("members."+key, null);
             else {
-                YamlConfiguration memberYaml = membersYaml.getConfigurationSection(key);
-                memberYaml.set("id", member.getID());
-                memberYaml.set("password", member.getPassword());
-                memberYaml.set("nickname", member.getNickname());
-                if (member.isAdmin()) memberYaml.set("admin", true);
+                yaml.set("members."+key+".id", member.getID());
+                yaml.set("members."+key+".password", member.getPassword());
+                yaml.set("members."+key+".nickname", member.getNickname());
+                if (member.isAdmin()) yaml.set("members."+key+".admin", true);
             }
             yaml.save(file);
         } catch (IOException e) {

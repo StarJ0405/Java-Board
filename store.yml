@@ -36,7 +36,17 @@ posts:
     show: 16
     comments: {}
     loves: [user2]
+  '5':
+    number: 5
+    author: admin
+    title: Test2
+    description: for Testing create changed Yaml
+    date: '2024-03-15T13:45:55.103231100'
+    show: 0
+    loves: []
 members:
   admin: {id: admin, password: admin, nickname: 어드민, admin: true}
   user: {id: user, password: user, nickname: 유저}
   user2: {id: user2, password: user2, nickname: 유저2}
+  user3: {id: user3, password: user3, nickname: user3}
+  user4: {id: user4, password: user, nickname: user4}
